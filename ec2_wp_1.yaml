@@ -43,13 +43,13 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash -xe
-          yum update -y
-          yum install -y httpd24 php73 php73-mysqlnd
-          service httpd start
-          chkconfig httpd on
+          sudo yum update -y
+          sudo yum install -y httpd24 php73 php73-mysqlnd
+          sudo service httpd start
+          sudo chkconfig httpd on
           echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
-          curl -O https://wordpress.org/latest.tar.gz
-          tar -zxvf latest.tar.gz
-          cp -R wordpress/* /var/www/html/
-          chown -R apache:apache /var/www/html/
-          service httpd restart
+          sudo curl -O https://wordpress.org/latest.tar.gz
+          sudo tar -zxvf latest.tar.gz
+          sudo cp -R wordpress/* /var/www/html/
+          sudo chown -R apache:apache /var/www/html/
+          sudo service httpd restart
