@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation Template for WordPress with Local MySQL Database'
+
+Parameters:
+  DBName:
+    Type: String
+    Default: wordpressdb
+    Description: The WordPress database name
+
+  DBUser:
+    Type: String
+    Default: admin
+    Description: The WordPress database admin account username
+
+  DBPassword:
+    Type: String
+    Default: F43ohG2m34_d6
+    NoEcho: true
+    Description: The WordPress database admin account password
+
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    Description: WebServer EC2 instance type
+
+Resources:
+  WordPressSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound traffic for WordPress
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+
+  WordPressInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0dbc3d7bc646e8516 
+      InstanceType: !Ref InstanceType
+      SecurityGroupIds:
+        - !GetAtt WordPressSecurityGroup.GroupId
+      KeyName: my-keys
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y
+          yum install -y httpd24 php73 php73-mysqlnd
+          service httpd start
+          chkconfig httpd on
+          echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
+          curl -O https://wordpress.org/latest.tar.gz
+          tar -zxvf latest.tar.gz
+          cp -R wordpress/* /var/www/html/
+          chown -R apache:apache /var/www/html/
+          service httpd restart
